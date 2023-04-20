@@ -1,0 +1,12 @@
+CMD: staterpack(playerid, params[])
+{
+	if(GetPlayerData(playerid, P_DRIVING_A) == 1) return SendClientMessage(playerid,0x3399FFFF,"Anda Sudah Mengambil Staterpack");
+	if(!IsPlayerInRangeOfPoint(playerid, 3.0, 1761.9359,-1901.1544,13.6419)) return Error(playerid, "Anda harus berada di tempat pengambilan staterpack!");
+	{
+	GivePlayerMoneyEx(playerid,550000);
+	SetPlayerData(playerid, P_DRIVING_A, 1);
+	UpdatePlayerDatabaseInt(playerid, "driving_a", GetPlayerData(playerid, P_DRIVING_A));
+	SendClientMessage(playerid, COLOR_WHITE,"Kamu Berhasil Mengambil Staterpack");
+	}
+	return 1;
+}
