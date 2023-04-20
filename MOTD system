@@ -1,0 +1,79 @@
+new GlobalMOTD[128];
+new AdminMOTD[128];
+
+LoadMOTDs()
+{
+	new arrCoords[4][128];
+	new strFromFile2[512];
+	new File: file = fopen("motd.ini", io_read);
+	if (file)
+	{
+		fread(file, strFromFile2);
+		splits(strFromFile2, arrCoords, '|');
+		strmid(GlobalMOTD, arrCoords[0], 0, strlen(arrCoords[0]), 255);
+		strmid(AdminMOTD, arrCoords[1], 0, strlen(arrCoords[1]), 255);
+		strmid(CAMOTD, arrCoords[3], 0, strlen(arrCoords[3]), 255);
+		fclose(file);
+	}
+	else
+	{
+		fcreate("motd.ini");
+		print("motd.ini doesn't exit, setting the default MOTDs");
+		format(GlobalMOTD, sizeof(GlobalMOTD), "Welcome to Emerald Reality Project Server.");
+		format(AdminMOTD, sizeof(AdminMOTD), "Admin MOTD: None.");
+		format(CAMOTD, sizeof(CAMOTD), "Helpers MOTD: None.");
+  		SaveMOTDs();
+	}
+	return 1;
+}
+
+SaveMOTDs()
+{
+	new coordsString[512];
+	format(coordsString, sizeof(coordsString), "%s|%s|%s", GlobalMOTD,AdminMOTD,CAMOTD);
+	new File: file2 = fopen("motd.ini", io_write);
+	fwrite(file2, coordsString);
+	fclose(file2);
+	return 1;
+}
+
+LoadMOTDs(); //public ongamemodeinit
+
+new MOTD1[10000];
+format(MOTD1, sizeof(MOTD1), "{C6E2FF}MOTD:{F7FF00} %s", GlobalMOTD);
+SendClientMessageEx(playerid, COLOR_GREY, MOTD1);
+if(PlayerInfo[playerid][pAdmin] >= 2)
+{
+	format(MOTD1, sizeof(MOTD1), "STAFF MOTD:{FFFFFF} %s", AdminMOTD);
+ SendClientMessageEx(playerid, COLOR_REALRED, MOTD1);
+} // Onplayerlogin
+
+CMD:motd(playerid, params[])
+{
+    if(PlayerInfo[playerid][pAdmin] >= 10)
+    {
+		if(isnull(params)) return SendClientMessageEx(playerid, COLOR_GOLD, "USAGE: /motd [message]");
+		new String[10000];
+    	format(String, sizeof(String), "AdmCmd: %s has changed the global motd to: %s.", GetName(playerid), params);
+		ABroadCast( COLOR_LIGHTRED, String, 1);
+		format(GlobalMOTD, sizeof(GlobalMOTD), "%s {FF0000}- %s", params, PlayerInfo[playerid][pUCP]);
+		SendClientMessageEx(playerid, COLOR_WHITE, "You've adjusted the Global MOTD.");
+		SaveMOTDs();
+	}
+	return 1;
+}
+
+CMD:amotd(playerid, params[])
+{
+    if(PlayerInfo[playerid][pAdmin] >= 10)
+    {
+		if(isnull(params)) return SendClientMessageEx(playerid, COLOR_YELLOW, "USAGE: /amotd [message]");
+		new String[10000];
+		format(AdminMOTD, sizeof(AdminMOTD), "%s {00FFFF}- %s", params, PlayerInfo[playerid][pUCP]);
+		format(String, sizeof(String), "AdmCmd: %s has changed the admin motd to: %s.", GetName(playerid), params);
+		ABroadCast( COLOR_LIGHTRED, String, 1);
+		SendClientMessageEx(playerid, COLOR_WHITE, "You've adjusted the Admin MOTD.");
+		SaveMOTDs();
+	}
+	return 1;
+}
