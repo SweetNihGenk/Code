@@ -1,0 +1,12 @@
+CMD:getcord(playerid)
+{
+    new Float: pX, 
+        Float: pY, 
+        Float: pZ;
+
+    new cord[100];
+    GetPlayerPos(playerid, pX, pY, pZ);
+    format(cord, sizeof cord, "Koordinat : \nX : %f Y : %f Z : %f", pX, pY, pZ);
+    SendClientMessage(playerid, -1, cord);
+    return 1;
+}
